@@ -16,26 +16,52 @@
         var camera, scene, renderer;
         var geometry, material, mesh;
 
+        function extrude_triangle(){
+            var triangle = new THREE.Shape([
+                new THREE.Vector2(0, 50),
+                new THREE.Vector2(50, 50),
+                new THREE.Vector2(50, 0)
+            ]);
+            return new THREE.ExtrudeGeometry(triangle, {
+                bevelEnabled: false,
+                amount: 30
+            });
+        }; 
+
         function init(){
 
             scene = new THREE.Scene();
-            geometry = new THREE.IcosahedronGeometry(200, 1);
+            // geometry = new THREE.IcosahedronGeometry(2, 1);
+            // geometry = new  THREE.CubeGeometry(2, 2, 1);
+            // geometry = new THREE.Sphere(80, 1);
+            /* 
+            geometry = new THREE.Geometry();
+            geometry.vertices = [
+                new THREE.Vector3(0, 0, 0),
+                new THREE.Vector3(0, 100, 0),
+                new THREE.Vector3(0, 0, 100)
+            ];
+            geometry.faces.push(new THREE.Face3(0, 1, 2));
+            geometry.computeBoundingSphere();
+            */
+            geometry = extrude_triangle();
             material = new THREE.MeshBasicMaterial({
-                color: 0x000000,
+                color: 0x00ff00,
                 wireframe: true,
                 wireframeLinewidth: 2
             });
             mesh = new THREE.Mesh(geometry, material);
 
-            scence.add(mesh);
+            scene.add(mesh);
 
-            renderer = new THREE.CanvasRenderer();
+            renderer = new THREE.WebGLRenderer();
             renderer.setSize(window.innerWidth, window.innerHeight);
             document.body.appendChild(renderer.domElement);
 
-            camera = new THREE.PerspectiveCamera(75, window.innerWidth/ window.innerHeight, 1, 1000);
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth/ window.innerHeight, 0.1, 1000);
+            camera.position.z = 100;
 
-                renderer.render(scence, camera);
+                renderer.render(scene, camera);
             };
 
         function animate(){
