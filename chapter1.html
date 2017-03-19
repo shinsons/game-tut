@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <style>
+      body {
+        background-color: #ffffff;
+        margin: 0;
+        overflow: hidden;
+      }
+    </style>
+  </head>
+  <body>
+    <script src="http://mrdoob.github.com/three.js/build/three.min.js"></script>
+    <script src="dat.gui.min.js"></script>
+    <script>
+        var camera, scene, renderer;
+
+        function render() {
+            scene.getObjectByName('cube').material.opacity = control.opacity;
+            scene.getObjectByName('cube').material.color = new THREE.Color(control.color);
+            renderer.render(scene, camera);
+            requestAnimationFrame(render);
+        };
+        function addControlGui(controlObject) {
+            var gui = new dat.GUI();
+            gui.add(controlObject, 'rotationSpped', -0.01, 0.01);
+            gui.add(controlObject, 'opacity', 0.1, 1);
+            gui.addColor(controlObject, 'color');
+        };
+        function init() {
+            scene = new THREE.Scene();
+            renderer = new THREE.WebGLRenderer();
+            renderer.setClearColor(0x000000, 1.0);
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.shadowMapEnabled = true;
+            
+            camera = new THREE.PerspectiveCamera(
+                45,
+                window.innerWidth/ window.innerHeight,
+                0.1,
+                1000
+            );
+            camera.position.x = 15;
+            camera.position.y = 16;
+            camera.position.z = 13;
+            camera.lookAt(scene.position);
+            document.body.appendChild(renderer.domElement);
+            var cubeGeometry = new THREE.CubeGeometry(6, 4, 6);
+            var cubeMaterial = new THREE.MeshLambertMaterial({
+                color: "red"
+            });
+            var cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+            cube.name = 'cube';
+            cube.castShadow = true;
+            scene.add(cube);
+            var planeGeometry = new THREE.PlaneGeometry(20, 20);
+            var planeMaterial = new THREE.MeshLambertMaterial({
+                color: 0xcccccc
+            });
+            var plane = new THREE.Mesh(planeGeometry, planeMaterial);
+            plane.receiveShadow = true;
+
+            plane.rotation.x = -0.5 * Math.PI;
+            plane.position.y = -2;
+            scene.add(plane);
+
+            var spotLight = new THREE.SpotLight(0xffffff);
+            spotLight.position.set(10, 20, 20);
+            spotLight.castShadow = true;
+            scene.add(spotLight);
+
+            control = new function() {
+                this.rotationSpped = 0.005;
+                this.opacity = 0.6;
+                this.color = cubeMaterial.color.getHex();
+            };
+            addControlGui(control);
+            render();
+        };
+        window.onload = init;
+        /*
+        function animate(){
+            requestAnimationFrame(animate);
+
+            mesh.rotation.x = Date.now() * 0.00005;
+            mesh.rotation.y = Date.now() * 0.0001;
+
+            renderer.render(scene, camera);
+        };
+        init();
+        animate();
+        */
+    </script>
+  </body>
+</html>

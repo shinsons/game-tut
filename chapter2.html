@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <style>
+      body {
+        background-color: #ffffff;
+        margin: 0;
+        overflow: hidden;
+      }
+    </style>
+  </head>
+  <body>
+    <script src="https://threejs.org/build/three.js"></script>
+    <script src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>
+    <script src="dat.gui.min.js"></script>
+    <script>
+        var camera, scene, renderer, cameraControl;
+
+        function render() {
+            //scene.getObjectByName('cube').material.opacity = control.opacity;
+            // scene.getObjectByName('cube').material.color = new THREE.Color(control.color);
+            renderer.render(scene, camera);
+            cameraControl.update();
+            requestAnimationFrame(render);
+        };
+        function addControlGui(controlObject) {
+            var gui = new dat.GUI();
+            gui.add(controlObject, 'rotationSpped', -0.01, 0.01);
+            //gui.add(controlObject, 'opacity', 0.1, 1);
+            //gui.addColor(controlObject, 'color');
+        };
+        function createEarthMaterial() {
+            tex = new THREE.TextureLoader().load("earthmap4k.jpg");
+            earthMaterial = new THREE.MeshPhongMaterial({map: tex});
+            return earthMaterial
+        };
+        function createCloudMaterial() {
+            tex = new THREE.TextureLoader().load("cloud_map.png")
+            cloudMaterial = new THREE.MeshPhongMaterial({
+                map: tex,
+                transparent: true
+            });
+            return cloudMaterial
+        };
+        function init() {
+            scene = new THREE.Scene();
+            renderer = new THREE.WebGLRenderer();
+            renderer.setClearColor(0x000000, 1.0);
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.shadowMap.enabled = true;
+            
+            camera = new THREE.PerspectiveCamera(
+                45,
+                window.innerWidth/ window.innerHeight,
+                0.1,
+                1000
+            );
+            camera.position.x = 35;
+            camera.position.y = 36;
+            camera.position.z = 33;
+            camera.lookAt(scene.position);
+
+            cameraControl = new THREE.OrbitControls(camera);
+
+            document.body.appendChild(renderer.domElement);
+            // Earth geometry
+            var sphereGeometry = new THREE.SphereGeometry(15, 30, 30);
+            var earthMesh = new THREE.Mesh(
+                sphereGeometry, createEarthMaterial()
+            );
+            earthMesh.name = 'earth';
+            // Cloud Geometry
+            var cloudGeometry = new THREE.SphereGeometry(
+                sphereGeometry.parameters.radius*1.01,
+                sphereGeometry.parameters.widthSegments,
+                sphereGeometry.parameters.heightSegments
+            );
+            var cloudMesh = new THREE.Mesh(cloudGeometry, createCloudMaterial());
+            scene.add(earthMesh);
+            scene.add(cloudMesh);
+
+            var directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+            directionalLight.position = new THREE.Vector3(100, 10, -50);
+            scene.add(directionalLight);
+            var ambientLight = new THREE.AmbientLight(0x111111);
+            scene.add(ambientLight);
+
+            control = new function() {
+                this.rotationSpped = 0.005;
+                //this.opacity = 0.6;
+                //this.color = sphereMaterial.color.getHex();
+            };
+            addControlGui(control);
+            render();
+        };
+        window.onload = init;
+        /*
+        function animate(){
+            requestAnimationFrame(animate);
+
+            mesh.rotation.x = Date.now() * 0.00005;
+            mesh.rotation.y = Date.now() * 0.0001;
+
+            renderer.render(scene, camera);
+        };
+        init();
+        animate();
+        */
+    </script>
+  </body>
+</html>
